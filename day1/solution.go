@@ -64,7 +64,5 @@ func SolutionB(in string) (string, error) {
 
 	top := totals[len(totals)-3:]
 	tot := advent2022.SumInts(top)
-	fmt.Printf("totals: %v\n", totals)
-	fmt.Printf("top: %v\n", top)
 	return fmt.Sprintf("%d", tot), nil
 }
