@@ -5,6 +5,7 @@ import (
 
 	"github.com/yavosh/advent2022"
 	"github.com/yavosh/advent2022/day1"
+	"github.com/yavosh/advent2022/day2"
 )
 
 func main() {
@@ -15,8 +16,11 @@ func main() {
 	}
 
 	solutions := map[string]problem{
-		"day1":  {solver: day1.Solution, in: "day1.txt"},
+		"day1a": {solver: day1.Solution, in: "day1.txt"},
 		"day1b": {solver: day1.SolutionB, in: "day1.txt"},
+
+		"day2a": {solver: day2.Solution, in: "day2.txt"},
+		"day2b": {solver: day2.SolutionB, in: "day2.txt"},
 	}
 
 	for name, s := range solutions {
