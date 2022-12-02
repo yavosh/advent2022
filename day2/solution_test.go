@@ -1,4 +1,4 @@
-package day1
+package day2
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 )
 
 func TestSolution(t *testing.T) {
-	in, err := advent2022.ReadFile("../testdata/day1.txt")
+	in, err := advent2022.ReadFile("../testdata/day2.txt")
 	if err != nil {
 		t.Errorf("error %v", err)
 		t.FailNow()
@@ -23,11 +23,12 @@ func TestSolution(t *testing.T) {
 }
 
 func TestSolutionB(t *testing.T) {
-	in, err := advent2022.ReadFile("../testdata/day1.txt")
+	in, err := advent2022.ReadFile("../testdata/day2.txt")
 	if err != nil {
 		t.Errorf("error %v", err)
 		t.FailNow()
 	}
+
 	if res, err := SolutionB(in); err != nil {
 		t.Errorf("error %v", err)
 		t.FailNow()
