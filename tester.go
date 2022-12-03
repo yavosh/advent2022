@@ -1,7 +1,6 @@
 package advent2022
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -19,7 +18,6 @@ func Tester(t *testing.T, prefix, file string, s Solver, expected string) {
 		if res != expected {
 			t.Errorf("want %q got %q", expected, res)
 		}
-		fmt.Printf("%s is %q\n", prefix, res)
 	}
 
 }
