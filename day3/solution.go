@@ -97,7 +97,6 @@ func SolutionB(in string) (string, error) {
 	dup := duplicatesB(group)
 	results = append(results, dup)
 
-	fmt.Printf("results: %d %v\n", len(results), results)
 	for i, r := range results {
 		if len(r) != 1 {
 			panic("multiple results in group " + fmt.Sprintf("%d", i))

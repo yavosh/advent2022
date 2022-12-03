@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func Tester(t *testing.T, prefix, file string, s Solver) {
+func Tester(t *testing.T, prefix, file string, s Solver, expected string) {
 	in, err := ReadFile(file)
 	if err != nil {
 		t.Errorf("error %v", err)
@@ -16,6 +16,10 @@ func Tester(t *testing.T, prefix, file string, s Solver) {
 		t.Errorf("error %v", err)
 		t.FailNow()
 	} else {
+		if res != expected {
+			t.Errorf("want %q got %q", expected, res)
+		}
 		fmt.Printf("%s is %q\n", prefix, res)
 	}
+
 }
