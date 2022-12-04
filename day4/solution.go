@@ -28,30 +28,6 @@ func toSections(in string) []section {
 	return result
 }
 
-func toSet(in string) []int {
-	parts := strings.Split(in, "-")
-	from, _ := strconv.Atoi(parts[0])
-	to, _ := strconv.Atoi(parts[1])
-	result := make([]int, 0, 10)
-	for from <= to {
-		result = append(result, from)
-		from++
-	}
-
-	return result
-}
-
-func toSets(in string) [][]int {
-	defs := strings.Split(in, ",")
-	result := make([][]int, len(defs))
-
-	for i, r := range defs {
-		result[i] = toSet(r)
-	}
-
-	return result
-}
-
 func contains(section1, section2 section) bool {
 	if section1.from >= section2.from && section1.to <= section2.to {
 		return true
