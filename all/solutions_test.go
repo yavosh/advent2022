@@ -8,6 +8,7 @@ import (
 	"github.com/yavosh/advent2022/day2"
 	"github.com/yavosh/advent2022/day3"
 	"github.com/yavosh/advent2022/day4"
+	"github.com/yavosh/advent2022/day5"
 )
 
 func TestAll(t *testing.T) {
@@ -26,6 +27,8 @@ func TestAll(t *testing.T) {
 		{"day3-B", "../testdata/day3.txt", day3.SolutionB, "2577"},
 		{"day4-A", "../testdata/day4.txt", day4.Solution, "573"},
 		{"day4-B", "../testdata/day4.txt", day4.SolutionB, "867"},
+		{"day5-A", "../testdata/day5.txt", day5.Solution, "FWSHSPJWM"},
+		{"day5-B", "../testdata/day5.txt", day5.SolutionB, "PWPWHGFZS"},
 	}
 
 	for _, tt := range tests {

@@ -1,4 +1,4 @@
-package day4
+package day5
 
 import (
 	"testing"
@@ -7,6 +7,12 @@ import (
 )
 
 func TestSolution(t *testing.T) {
-	advent2022.Tester(t, "day5", "../testdata/day5.txt", Solution, "FWSHSPJWM")
-	advent2022.Tester(t, "day5", "../testdata/day5.txt", SolutionB, "MCD")
+	t.Run("day5", func(t *testing.T) {
+		advent2022.Tester(t, "day5", "../testdata/day5.txt", Solution, "FWSHSPJWM")
+
+	})
+
+	t.Run("day5b", func(t *testing.T) {
+		advent2022.Tester(t, "day5", "../testdata/day5.txt", SolutionB, "PWPWHGFZS")
+	})
 }

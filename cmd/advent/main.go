@@ -8,6 +8,7 @@ import (
 	"github.com/yavosh/advent2022/day2"
 	"github.com/yavosh/advent2022/day3"
 	"github.com/yavosh/advent2022/day4"
+	"github.com/yavosh/advent2022/day5"
 )
 
 func main() {
@@ -29,6 +30,9 @@ func main() {
 
 		"day4a": {solver: day4.Solution, in: "day4.txt"},
 		"day4b": {solver: day4.SolutionB, in: "day4.txt"},
+
+		"day5a": {solver: day5.Solution, in: "day5.txt"},
+		"day5b": {solver: day5.SolutionB, in: "day5.txt"},
 	}
 
 	for name, s := range solutions {

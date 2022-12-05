@@ -1,4 +1,4 @@
-package day4
+package day5
 
 import (
 	"fmt"
@@ -37,26 +37,23 @@ func (s *stack) pop() string {
 	return head
 }
 
-func (s *state) move(from, to int) {
-	fmt.Printf("move from:%d to:%d\n", from, to)
-	val := s.stacks[from-1].pop()
-	s.stacks[to-1].push(val)
+func (s *state) move9000(cmd command) {
+	for i := 0; i < cmd.count; i++ {
+		val := s.stacks[cmd.from-1].pop()
+		s.stacks[cmd.to-1].push(val)
+	}
 }
 
-func (s *state) moven(n, from, to int) {
-	fmt.Printf("moven n:%d from:%d to:%d\n", n, from, to)
-
+func (s *state) move9001(cmd command) {
 	buff := make([]string, 0)
-
-	for i := 0; i < n; i++ {
-		buff = append(buff, s.stacks[from-1].pop())
+	for i := 0; i < cmd.count; i++ {
+		buff = append(buff, s.stacks[cmd.from-1].pop())
 	}
 
-	fmt.Printf("move buff: %#v\n", buff)
 	for len(buff) > 0 {
 		tail := buff[len(buff)-1]
 		buff = buff[0 : len(buff)-1]
-		s.stacks[to-1].push(tail)
+		s.stacks[cmd.to-1].push(tail)
 	}
 }
 
@@ -68,7 +65,6 @@ func (s *state) height() int {
 			res = s.stacks[i].size()
 		}
 	}
-
 	return res
 }
 
@@ -159,7 +155,6 @@ func Solution(in string) (string, error) {
 	}
 
 	crates := load(curr)
-	crates.print()
 
 	for i, line := range lines {
 		if i <= start {
@@ -176,14 +171,7 @@ func Solution(in string) (string, error) {
 		if err != nil {
 			return "", fmt.Errorf("error parsing command %d %s", i, line)
 		}
-
-		fmt.Printf("command %s %#v %#v \n", line, tokens(line), cmd)
-
-		for i := 0; i < cmd.count; i++ {
-			crates.move(cmd.from, cmd.to)
-		}
-
-		crates.print()
+		crates.move9000(cmd)
 	}
 
 	result := ""
@@ -211,7 +199,6 @@ func SolutionB(in string) (string, error) {
 	}
 
 	crates := load(curr)
-	crates.print()
 
 	for i, line := range lines {
 		if i <= start {
@@ -229,11 +216,7 @@ func SolutionB(in string) (string, error) {
 			return "", fmt.Errorf("error parsing command %d %s", i, line)
 		}
 
-		fmt.Printf("command %s %#v %#v \n", line, tokens(line), cmd)
-
-		crates.moven(cmd.count, cmd.from, cmd.to)
-
-		crates.print()
+		crates.move9001(cmd)
 	}
 
 	result := ""
