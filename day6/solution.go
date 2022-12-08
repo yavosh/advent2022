@@ -7,17 +7,12 @@ import (
 
 func duplicates(in string) int {
 	seen := map[rune]int8{}
-
-	strings.Count("ala", "a")
-
 	for i, r := range in {
 		seen[r]++
-
 		if seen[r] > 1 {
 			return i
 		}
 	}
-
 	return -1
 }
 
