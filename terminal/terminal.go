@@ -7,57 +7,30 @@ import (
 	"strings"
 )
 
-type Entry struct {
-	EntryType string
-	Entries   []Entry
-	Path      string
-	Name      string
-	Size      int
-}
-
-func (e Entry) Print() {
-
-	if e.EntryType == "F" {
-		fmt.Printf("%d %q\n", e.Size, path.Join("/", e.Path, e.Name))
-		return
-	}
-
-	fmt.Printf("dir %q\n", path.Join("/", e.Path, e.Name))
-
-	for _, e := range e.Entries {
-		e.Print()
-	}
-}
-
-func (e Entry) String() string {
-	if e.EntryType == "D" {
-		return fmt.Sprintf("dir %q", e.Name)
-	}
-
-	return fmt.Sprintf("%d %q", e.Size, e.Name)
-}
-
 type Terminal struct {
 	cwd     []string
-	entries map[string][]Entry
+	handles map[string]Entry // path -> entry
 	dirs    map[string]*Entry
-	du      map[string]int
 	cmd     string
 }
 
 func New() *Terminal {
 	t := Terminal{
 		cwd:     make([]string, 0),
-		entries: make(map[string][]Entry, 0),
+		handles: make(map[string]Entry, 0),
 		dirs:    make(map[string]*Entry, 0),
-		du:      make(map[string]int, 0),
 	}
 
 	t.dirs["/"] = &Entry{
 		EntryType: "D",
 		Path:      "/",
 		Name:      "/",
-		Entries:   make([]Entry, 0),
+	}
+
+	t.handles["/"] = Entry{
+		EntryType: "D",
+		Path:      "/",
+		Name:      "/",
 	}
 
 	return &t
@@ -67,18 +40,35 @@ func (t *Terminal) Path() string {
 	return "/" + strings.Join(t.cwd, "/")
 }
 
-func (t *Terminal) Read(l string) error {
-	//fmt.Printf("[%q] %q \n", t.Path(), l)
+func (t *Terminal) DU(p string) (int, error) {
+	entry, ok := t.handles[p]
+	if !ok {
+		return 0, fmt.Errorf("du invalid path %s", p)
+	}
 
+	if !entry.IsDir() {
+		return 0, fmt.Errorf("du invalid path, not dir %s %s", entry.EntryType, p)
+	}
+
+	sum := 0
+	for _, child := range t.handles {
+		if child.IsFile() {
+			if strings.HasPrefix(child.Path, entry.Path) {
+				sum += child.Size
+			}
+		}
+	}
+
+	return sum, nil
+}
+
+func (t *Terminal) Read(l string) error {
 	if IsCommand(l) {
 		t.Command(l[2:])
 		return nil
 	}
 
 	if t.cmd == "ls" {
-		if _, ok := t.entries[t.Path()]; !ok {
-			t.entries[t.Path()] = make([]Entry, 0)
-		}
 
 		// dir
 		if strings.HasPrefix(l, "dir ") {
@@ -86,14 +76,10 @@ func (t *Terminal) Read(l string) error {
 				EntryType: "D",
 				Path:      path.Join(t.Path(), l[4:]),
 				Name:      l[4:],
-				Entries:   make([]Entry, 0),
 			}
 
-			t.entries[t.Path()] = append(t.entries[t.Path()], entry)
+			t.handles[entry.Path] = entry
 			t.dirs[path.Join(t.Path(), "/", l[4:])] = &entry
-			t.dirs[t.Path()].Entries = append(t.dirs[t.Path()].Entries, entry)
-			// make sure we have entry
-			t.du[t.Path()] += 0
 			return nil
 		}
 
@@ -104,21 +90,26 @@ func (t *Terminal) Read(l string) error {
 			entry := Entry{
 				EntryType: "F",
 				Name:      strings.TrimSpace(parts[1]),
+				Path:      path.Join(t.Path(), parts[1]),
+			}
+
+			if exist, ok := t.handles[entry.Path]; ok {
+				panic(fmt.Errorf("duplicate file %#v %#v", exist, entry))
 			}
 
 			if v, err := strconv.Atoi(parts[0]); err == nil {
-				t.du[t.Path()] += v
 				entry.Size = v
+			} else {
+				return fmt.Errorf("could not parse size for file %s", parts[0])
 			}
 
-			t.entries[t.Path()] = append(t.entries[t.Path()], entry)
-			t.dirs[t.Path()].Entries = append(t.dirs[t.Path()].Entries, entry)
+			t.handles[entry.Path] = entry
 			return nil
 		}
 
 	}
 
-	panic("can't process data for command " + t.cmd)
+	return fmt.Errorf("can't process data for command %q", t.cmd)
 }
 
 func (t *Terminal) Command(cmd string) {
@@ -150,44 +141,50 @@ func (t *Terminal) Command(cmd string) {
 	panic("unknown command " + cmd)
 }
 
-func (t *Terminal) DU(path string) int {
+func (t *Terminal) SumSizeUpTo(most int) (int, error) {
 	sum := 0
+	for _, entry := range t.handles {
+		if !entry.IsDir() {
+			continue
+		}
 
-	for k, v := range t.du {
-		if strings.HasPrefix(k, path) {
-			sum += v
+		size, err := t.DU(entry.Path)
+		//fmt.Printf("SumSizeUpTo %s %s %d\n", entry.Path, entry.EntryType, size)
+		if err != nil {
+			return 0, err
+		}
+
+		if size <= most {
+			sum += size
 		}
 	}
-	return sum
-}
 
-func (t *Terminal) SumSize(most int) int {
-	sum := 0
-	for k := range t.dirs {
-		du := t.DU(k)
-		if du <= most {
-			sum += du
-		}
-	}
-
-	return sum
-}
-
-func (t *Terminal) Print2() {
-	t.dirs["/"].Print()
+	return sum, nil
 }
 
 func (t *Terminal) Print() {
-	for k, v := range t.entries {
-		fmt.Printf("# %s %d\n", k, t.du[k])
-		for _, entry := range v {
-			fmt.Printf("> %s\n", entry)
+
+	sum := 0
+	files := 0
+	dirs := 0
+
+	for _, v := range t.handles {
+		fmt.Printf("%s \n", v)
+
+		if v.IsFile() {
+			files++
 		}
+
+		if v.IsDir() {
+			dirs++
+		}
+
+		sum += v.Size
 	}
 
-	for k, v := range t.du {
-		fmt.Printf("@ %s %d %d\n", k, v, t.DU(k))
-	}
+	fmt.Printf("%d entries, %d size, %d files, %d dirs\n", len(t.handles), sum, files, dirs)
+	tot, err := t.DU("/")
+	fmt.Printf("du '/' %d %v\n", tot, err)
 }
 
 func IsCommand(l string) bool {

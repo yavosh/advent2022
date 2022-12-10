@@ -8,10 +8,12 @@ import (
 
 func TestSolution(t *testing.T) {
 	t.Run("day7", func(t *testing.T) {
-		advent2022.Tester(t, "day7", "../testdata/day7t.txt", Solution, "1198")
+		// 1055975
+		// 1055975
+		advent2022.Tester(t, "day7", "../testdata/day7.txt", Solution, "x")
 	})
 
 	t.Run("day7b", func(t *testing.T) {
-		advent2022.Tester(t, "day7", "../testdata/day7.txt", SolutionB, "3120")
+		advent2022.Tester(t, "day7", "../testdata/day7t.txt", SolutionB, "x")
 	})
 }

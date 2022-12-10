@@ -16,11 +16,9 @@ func Solution(in string) (string, error) {
 		}
 	}
 
-	//fmt.Printf("term:%#v\n", term)
-	term.Print2()
-
-	answer := term.SumSize(100000)
-	return fmt.Sprintf("%d", answer), nil
+	term.Print()
+	answer, err := term.SumSizeUpTo(100000)
+	return fmt.Sprintf("%d", answer), err
 }
 
 func SolutionB(in string) (string, error) {
